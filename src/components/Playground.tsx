@@ -18,11 +18,8 @@ export default function Playground() {
         console.log('Here:', prompt);
 
         try {
-            console.log('Creating session with prompt:', prompt);
             const token = localStorage.getItem('token');
-            console.log('UserId:', localStorage.getItem('userId'));
-
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/sessions`, {
+            const res = await fetch('api/sessions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -42,14 +39,11 @@ export default function Playground() {
 
             const data = await res.json();
             const sessionId = data.sessionId;
-            console.log('Session created:', sessionId);
 
-            const es = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}/sessions/${sessionId}/stream`);
+            const es = new EventSource(`/api/sessions/${sessionId}/stream`);
 
             es.onmessage = (e) => {
                 const ev = JSON.parse(e.data).data;
-                console.log("SSE message:", ev);
-
                 if (ev.type === "all-complete") {
                     es.close();
                     setLoading(false);
